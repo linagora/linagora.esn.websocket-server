@@ -16,27 +16,42 @@ describe('The WebSockets server module', function() {
   });
 
   it('should provide a start state', function() {
-    var module = require('../../lib/index').WsServer;
+    var module = require('../../lib/index');
     expect(module.settings.states.start).to.exist;
     expect(module.settings.states.start).to.be.a('function');
   });
 
   it('should contains all needed properties.', function() {
-    var module = require('../../lib/index').WsServer;
-    module.settings.states.lib(function() {}, function(err, wsserver) {
+    var module = require('../../lib/index');
+    module.settings.states.lib(function() {}, function(err, wsModuleAPI) {
       expect(err).to.not.exist;
-      expect(wsserver).to.exist;
-      expect(wsserver).to.be.an.Object;
-      expect(wsserver.namespaces).to.exist;
-      expect(wsserver.namespaces).to.be.an.Array;
-      expect(wsserver).to.have.property('server');
-      expect(wsserver.server).to.be.null;
-      expect(wsserver).to.have.property('port');
-      expect(wsserver.port).to.be.null;
-      expect(wsserver).to.have.property('started');
-      expect(wsserver.started).to.be.false;
-      expect(wsserver).to.have.property('start');
-      expect(wsserver.start).to.be.a.Function;
+      expect(wsModuleAPI.server).to.exist;
+      expect(wsModuleAPI.server).to.be.an.Object;
+      expect(wsModuleAPI.server.namespaces).to.exist;
+      expect(wsModuleAPI.server.namespaces).to.be.an.Array;
+      expect(wsModuleAPI.server).to.have.property('server');
+      expect(wsModuleAPI.server.server).to.be.null;
+      expect(wsModuleAPI.server).to.have.property('port');
+      expect(wsModuleAPI.server.port).to.be.null;
+      expect(wsModuleAPI.server).to.have.property('started');
+      expect(wsModuleAPI.server.started).to.be.false;
+      expect(wsModuleAPI.server).to.have.property('start');
+      expect(wsModuleAPI.server.start).to.be.a.Function;
+    });
+  });
+
+  it('should expose the socketIOHelper', function() {
+    var module = require('../../lib/index');
+    module.settings.states.lib(function() {}, function(err, wsModuleAPI) {
+      expect(wsModuleAPI.helper).to.exist;
+      expect(wsModuleAPI.helper.getUserSocketsFromNamespace).to.exist;
+      expect(wsModuleAPI.helper.getUserSocketsFromNamespace).to.be.a('function');
+      expect(wsModuleAPI.helper.getInfos).to.exist;
+      expect(wsModuleAPI.helper.getInfos).to.be.a('function');
+      expect(wsModuleAPI.helper.setUserId).to.exist;
+      expect(wsModuleAPI.helper.setUserId).to.be.a('function');
+      expect(wsModuleAPI.helper.getUserId).to.exist;
+      expect(wsModuleAPI.helper.getUserId).to.be.a('function');
     });
   });
 
@@ -64,10 +79,10 @@ describe('The WebSockets server module', function() {
         mockery.registerMock('socket.io', ioMock);
         mockery.registerMock('express', expressMock);
 
-        var module = require('../../lib/index').WsServer;
-        module.settings.states.lib(this.dependencies, function(err, wsserver) {
+        var module = require('../../lib/index');
+        module.settings.states.lib(this.dependencies, function(err, wsModuleAPI) {
           expect(err).to.not.exist;
-          wsserver.start(1234, function() {
+          wsModuleAPI.server.start(1234, function() {
           });
         });
       });
@@ -91,10 +106,10 @@ describe('The WebSockets server module', function() {
 
         mockery.registerMock('socket.io', ioMock);
 
-        var module = require('../../lib/index').WsServer;
-        module.settings.states.lib(this.dependencies, function(err, api) {
+        var module = require('../../lib/index');
+        module.settings.states.lib(this.dependencies, function(err, wsModuleAPI) {
           expect(err).to.not.exist;
-          wsserver = api;
+          wsserver = wsModuleAPI.server;
           wsserver.start(8080, function() {});
           });
         });
@@ -120,10 +135,10 @@ describe('The WebSockets server module', function() {
 
         mockery.registerMock('socket.io', ioMock);
 
-        var module = require('../../lib/index').WsServer;
-        module.settings.states.lib(this.dependencies, function(err, api) {
+        var module = require('../../lib/index');
+        module.settings.states.lib(this.dependencies, function(err, wsModuleAPI) {
           expect(err).to.not.exist;
-          wsserver = api;
+          wsserver = wsModuleAPI.server;
           wsserver.start(443, function() {});
         });
       });
@@ -140,10 +155,10 @@ describe('The WebSockets server module', function() {
       mockery.registerMock('./middleware/setup-sessions', function() {});
       mockery.registerMock('socket.io', ioMock);
 
-      var module = require('../../lib/index').WsServer;
-      module.settings.states.lib(this.dependencies, function(err, wsserver) {
+      var module = require('../../lib/index');
+      module.settings.states.lib(this.dependencies, function(err, wsModule) {
         expect(err).to.not.exist;
-        wsserver.start(function() {
+        wsModule.server.start(function() {
           done();
         });
       });
@@ -164,10 +179,10 @@ describe('The WebSockets server module', function() {
 
       var store = require('../../lib/socketstore')(this.dependencies('logger'));
 
-      var module = require('../../lib/index').WsServer;
-      module.settings.states.lib(this.dependencies, function(err, wsserver) {
+      var module = require('../../lib/index');
+      module.settings.states.lib(this.dependencies, function(err, wsModuleAPI) {
         expect(err).to.not.exist;
-        wsserver.start(function() {
+        wsModuleAPI.server.start(function() {
           var socket = {
             id: 'socket1',
             request: {
@@ -209,10 +224,10 @@ describe('The WebSockets server module', function() {
 
       var store = require('../../lib/socketstore')(this.dependencies('logger'));
 
-      var module = require('../../lib/index').WsServer;
-      module.settings.states.lib(this.dependencies, function(err, wsserver) {
+      var module = require('../../lib/index');
+      module.settings.states.lib(this.dependencies, function(err, wsModuleAPI) {
         expect(err).to.not.exist;
-        wsserver.start(function() {
+        wsModuleAPI.server.start(function() {
           var socket = new Socket({userId: '123'});
           socket.id = 'socket1';
           ioEventEmitter.emit('connection', socket);
