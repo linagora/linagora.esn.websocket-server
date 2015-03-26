@@ -1,6 +1,6 @@
 {
   "name": "om-websocket-server",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "AwesomeModule to run a websocket server",
   "main": "lib/index.js",
   "dependencies": {
