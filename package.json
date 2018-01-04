@@ -1,5 +1,5 @@
 {
-  "name": "om-websocket-server",
+  "name": "linagora.esn.websocket-server",
   "version": "0.0.1",
   "description": "AwesomeModule to run a websocket server",
   "main": "lib/index.js",
